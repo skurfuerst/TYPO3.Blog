@@ -138,5 +138,26 @@ class SetupCommandController extends \TYPO3\FLOW3\MVC\Controller\CommandControll
 
 		return 'Done, created 1 blog, ' . $postCount . ' posts, ' . $commentCount . ' comments.';
 	}
+
+	/**
+	 * @var \TYPO3\FLOW3\Security\Cryptography\HashService
+	 * @inject
+	 */
+	protected $hashService;
+
+	/**
+	 *
+	 * @param string $user
+	 * @param string $newPassword
+	 */
+	public function resetPasswordCommand($user, $newPassword) {
+		$account = $this->accountRepository->findByAccountIdentifierAndAuthenticationProviderName($user, 'DefaultProvider');
+		if ($account !== NULL) {
+			$account->setCredentialsSource($this->hashService->hashPassword($newPassword));
+			return 'Updated password';
+		} else {
+			return 'Did not find account';
+		}
+	}
 }
 ?>
